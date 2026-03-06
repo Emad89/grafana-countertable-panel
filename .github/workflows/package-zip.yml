@@ -1,0 +1,51 @@
+name: Package Plugin Zip
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    env:
+      PLUGIN_ID: em-countertable-panel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build plugin
+        run: npm run build
+
+      - name: Create zip package
+        run: |
+          mkdir -p package/${PLUGIN_ID}
+          cp -R dist/* package/${PLUGIN_ID}/
+          ZIP_NAME="${PLUGIN_ID}-${GITHUB_REF_NAME:-${GITHUB_SHA}}.zip"
+          (cd package && zip -r "../${ZIP_NAME}" "${PLUGIN_ID}")
+          echo "ZIP_NAME=${ZIP_NAME}" >> "$GITHUB_ENV"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-zip
+          path: ${{ env.ZIP_NAME }}
+
+      - name: Publish release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_NAME }}
