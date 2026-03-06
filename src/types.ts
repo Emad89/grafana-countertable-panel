@@ -10,7 +10,9 @@ export interface SimpleOptions {
   showTypeIcons: boolean;
   sortBy: TableSortByFieldState[];
   frameIndex: number;
-  frozenColumns: number;
+  frozenColumns?: {
+    left?: number;
+  };
   enablePagination: boolean;
   cellHeight: TableCellHeight;
   maxRowHeight?: number;

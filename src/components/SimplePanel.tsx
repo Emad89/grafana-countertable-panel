@@ -146,6 +146,10 @@ export function SimplePanel(props: Props) {
 
   const main = addCounterColumn(frames[currentIndex], options);
 
+  if (main.length === 0) {
+    return <PanelDataErrorView panelId={id} fieldConfig={fieldConfig} data={data} />;
+  }
+
   if (count > 1) {
     const inputHeight = theme.spacing.gridSize * theme.components.height.md;
     const padding = theme.spacing.gridSize;
@@ -177,7 +181,7 @@ export function SimplePanel(props: Props) {
         onSortByChange={(sortBy: TableSortByFieldState[]) => onSortByChange(sortBy, props)}
         onColumnResize={(displayName: string, resizedWidth: number) => onColumnResize(displayName, resizedWidth, props)}
         onCellFilterAdded={panelContext.onAddAdHocFilter}
-        frozenColumns={options.frozenColumns}
+        frozenColumns={options.frozenColumns?.left ?? 0}
         enablePagination={options.enablePagination}
         cellHeight={options.cellHeight}
         maxRowHeight={options.maxRowHeight}
