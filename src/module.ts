@@ -4,12 +4,14 @@ import {
   defaultTableFieldOptions,
   defaultTableOptions,
   TableCellDisplayMode,
+  TableCellOptions,
   TableCellHeight,
   TableCellTooltipPlacement,
   TableFieldOptions,
 } from '@grafana/schema';
 import { SimpleOptions } from './types';
 import { SimplePanel } from './components/SimplePanel';
+import { TableCellTypeOptionEditor } from './components/TableCellTypeOptionEditor';
 
 const addTableCustomConfig = <T extends TableFieldOptions>(builder: FieldConfigEditorBuilder<T>) => {
   const category = [t('table.category-table', 'Table')];
@@ -108,29 +110,16 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel)
       });
 
       builder
-        .addSelect({
-          path: 'cellOptions.type',
+        .addCustomEditor<void, TableCellOptions>({
+          id: 'cellOptions',
+          path: 'cellOptions',
           name: t('table.name-cell-type', 'Cell type'),
+          editor: TableCellTypeOptionEditor,
+          override: TableCellTypeOptionEditor,
+          defaultValue: defaultTableFieldOptions.cellOptions,
+          process: identityOverrideProcessor,
           category: cellCategory,
-          defaultValue: TableCellDisplayMode.Auto,
-          settings: {
-            options: [
-              { value: TableCellDisplayMode.Auto, label: t('table.cell-types.auto', 'Auto') },
-              { value: TableCellDisplayMode.ColorText, label: t('table.cell-types.color-text', 'Colored text') },
-              {
-                value: TableCellDisplayMode.ColorBackground,
-                label: t('table.cell-types.color-background', 'Colored background'),
-              },
-              { value: TableCellDisplayMode.DataLinks, label: t('table.cell-types.data-links', 'Data links') },
-              { value: TableCellDisplayMode.Gauge, label: t('table.cell-types.gauge', 'Gauge') },
-              { value: TableCellDisplayMode.Sparkline, label: t('table.cell-types.sparkline', 'Sparkline') },
-              { value: TableCellDisplayMode.JSONView, label: t('table.cell-types.json', 'JSON View') },
-              { value: TableCellDisplayMode.Pill, label: t('table.cell-types.pill', 'Pill') },
-              { value: TableCellDisplayMode.Markdown, label: t('table.cell-types.markdown', 'Markdown + HTML') },
-              { value: TableCellDisplayMode.Image, label: t('table.cell-types.image', 'Image') },
-              { value: TableCellDisplayMode.Actions, label: t('table.cell-types.actions', 'Actions') },
-            ],
-          },
+          shouldApply: () => true,
         })
         .addBooleanSwitch({
           path: 'inspect',

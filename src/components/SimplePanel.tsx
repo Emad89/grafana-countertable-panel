@@ -181,7 +181,7 @@ export function SimplePanel(props: Props) {
         onSortByChange={(sortBy: TableSortByFieldState[]) => onSortByChange(sortBy, props)}
         onColumnResize={(displayName: string, resizedWidth: number) => onColumnResize(displayName, resizedWidth, props)}
         onCellFilterAdded={panelContext.onAddAdHocFilter}
-        frozenColumns={options.frozenColumns?.left ?? 0}
+        frozenColumns={options.frozenColumns?.left}
         enablePagination={options.enablePagination}
         cellHeight={options.cellHeight}
         maxRowHeight={options.maxRowHeight}
@@ -228,7 +228,11 @@ function getCurrentFrameIndex(frames: DataFrame[], options: SimpleOptions) {
 
 function onColumnResize(fieldDisplayName: string, width: number, props: Props) {
   const { fieldConfig } = props;
-  const { overrides } = fieldConfig;
+  const overrides = fieldConfig.overrides.map((override) => ({
+    ...override,
+    matcher: { ...override.matcher },
+    properties: override.properties.map((property) => ({ ...property })),
+  }));
 
   const matcherId = FieldMatcherID.byName;
   const propId = 'custom.width';
@@ -271,14 +275,19 @@ function onChangeTableSelection(val: SelectableValue<number>, props: Props) {
 
 const tableStyles = {
   singleWrapper: css({
+    display: 'flex',
+    flexDirection: 'column',
     height: '100%',
     minHeight: 0,
     minWidth: 0,
   }),
   tableContainer: css({
+    display: 'flex',
+    flexDirection: 'column',
     flex: 1,
     minHeight: 0,
     minWidth: 0,
+    overflow: 'auto',
   }),
   wrapper: css({
     display: 'flex',
