@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
-import { css } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import {
   cacheFieldDisplayNames,
   DashboardCursorSync,
@@ -168,7 +168,7 @@ export function SimplePanel(props: Props) {
     : undefined;
 
   const tableElement = (
-    <div className={disableCounterSortClass}>
+    <div className={cx(tableStyles.tableContainer, disableCounterSortClass)}>
       <TableNG
         initialRowIndex={initialRowIndex}
         height={tableHeight}
@@ -197,7 +197,7 @@ export function SimplePanel(props: Props) {
   );
 
   if (count === 1) {
-    return tableElement;
+    return <div className={tableStyles.singleWrapper}>{tableElement}</div>;
   }
 
   const names: Array<ComboboxOption<number>> = frames.map((frame, index) => {
@@ -270,13 +270,25 @@ function onChangeTableSelection(val: SelectableValue<number>, props: Props) {
 }
 
 const tableStyles = {
+  singleWrapper: css({
+    height: '100%',
+    minHeight: 0,
+    minWidth: 0,
+  }),
+  tableContainer: css({
+    flex: 1,
+    minHeight: 0,
+    minWidth: 0,
+  }),
   wrapper: css({
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
     height: '100%',
+    minHeight: 0,
+    minWidth: 0,
   }),
   selectWrapper: css({
     padding: '8px 8px 0px 8px',
+    flexShrink: 0,
   }),
 };
